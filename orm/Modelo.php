@@ -8,15 +8,24 @@ abstract class Modelo
 
     public static function activos(): array
     {
-        $consulta = Conexion::obtener()->query('SELECT * FROM ' . static::$tabla . ' WHERE estado = 1 ORDER BY id DESC');
+        $sql = 'SELECT * FROM ' . static::$tabla . '
+                WHERE estado = 1
+                ORDER BY id DESC';
+
+        $consulta = Conexion::obtener()->query($sql);
+
         return $consulta->fetchAll(PDO::FETCH_CLASS, static::class);
     }
 
     public static function buscar(int $id): ?static
     {
-        $consulta = Conexion::obtener()->prepare('SELECT * FROM ' . static::$tabla . ' WHERE id = ? AND estado = 1');
+        $sql = 'SELECT * FROM ' . static::$tabla . '
+                WHERE id = ? AND estado = 1';
+
+        $consulta = Conexion::obtener()->prepare($sql);
         $consulta->execute([$id]);
         $consulta->setFetchMode(PDO::FETCH_CLASS, static::class);
+
         return $consulta->fetch() ?: null;
     }
 
@@ -26,10 +35,15 @@ abstract class Modelo
 
         if ($id === null) {
             $marcadores = implode(', ', array_fill(0, count(static::$campos), '?'));
-            $sql = 'INSERT INTO ' . static::$tabla . ' (' . implode(', ', static::$campos) . ') VALUES (' . $marcadores . ')';
+            $sql = 'INSERT INTO ' . static::$tabla
+                . ' (' . implode(', ', static::$campos) . ')'
+                . ' VALUES (' . $marcadores . ')';
         } else {
             $asignaciones = array_map(fn ($campo) => $campo . ' = ?', static::$campos);
-            $sql = 'UPDATE ' . static::$tabla . ' SET ' . implode(', ', $asignaciones) . ' WHERE id = ? AND estado = 1';
+            $sql = 'UPDATE ' . static::$tabla
+                . ' SET ' . implode(', ', $asignaciones)
+                . ' WHERE id = ? AND estado = 1';
+
             $valores[] = $id;
         }
 
@@ -38,7 +52,11 @@ abstract class Modelo
 
     public static function desactivar(int $id): void
     {
-        $consulta = Conexion::obtener()->prepare('UPDATE ' . static::$tabla . ' SET estado = 0 WHERE id = ? AND estado = 1');
+        $sql = 'UPDATE ' . static::$tabla . '
+                SET estado = 0
+                WHERE id = ? AND estado = 1';
+
+        $consulta = Conexion::obtener()->prepare($sql);
         $consulta->execute([$id]);
     }
 }

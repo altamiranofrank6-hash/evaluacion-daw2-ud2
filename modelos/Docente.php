@@ -4,7 +4,16 @@ declare(strict_types=1);
 class Docente extends Modelo
 {
     protected static string $tabla = 'docente';
-    protected static array $campos = ['id_facultad', 'dni', 'apellidos', 'nombres', 'correo', 'categoria', 'dedicacion'];
+    protected static array $campos = [
+        'id_facultad',
+        'dni',
+        'apellidos',
+        'nombres',
+        'correo',
+        'categoria',
+        'dedicacion',
+    ];
+
     public int $id;
     public int $id_facultad;
     public string $dni;
@@ -18,7 +27,12 @@ class Docente extends Modelo
 
     public static function conFacultad(): array
     {
-        $sql = 'SELECT docente.*, facultad.nombre AS facultad FROM docente INNER JOIN facultad ON facultad.id = docente.id_facultad WHERE docente.estado = 1 ORDER BY docente.id DESC';
+        $sql = 'SELECT docente.*, facultad.nombre AS facultad
+                FROM docente
+                INNER JOIN facultad ON facultad.id = docente.id_facultad
+                WHERE docente.estado = 1
+                ORDER BY docente.id DESC';
+
         return Conexion::obtener()->query($sql)->fetchAll(PDO::FETCH_CLASS, self::class);
     }
 }
